@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-  id: 'dsh-lol-worlds',
+  id: 'dsh-lol-esports',
   factory(require) {
     const React = require('react');
     const h = React.createElement;
@@ -289,13 +289,13 @@ window.__ModuleLoader__.load({
       '@media (prefers-reduced-motion:reduce){.lol-page *{transition:none!important;animation:none!important}}',
     ].join('');
 
-    const STYLE_TAG_ID = 'dsh-lol-worlds/page.css';
+    const STYLE_TAG_ID = 'dsh-lol-esports/page.css';
     if (
       typeof document !== 'undefined' &&
       document.querySelector(`style[data-plugin-css=${JSON.stringify(STYLE_TAG_ID)}]`) === null
     ) {
       const tag = document.createElement('style');
-      tag.dataset.plugin = 'dsh-lol-worlds';
+      tag.dataset.plugin = 'dsh-lol-esports';
       tag.dataset.pluginCss = STYLE_TAG_ID;
       tag.textContent = CSS;
       document.head.appendChild(tag);

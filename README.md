@@ -1,4 +1,4 @@
-# dsh-lol-worlds · S 赛观赛助手（本地分支）
+# dsh-lol-esports · S 赛观赛助手（本地分支）
 
 > 这份代码是从 [Rustyibe/dsh-lol](https://github.com/Rustyibe/dsh-lol)（MIT）复制出来自己维护的**个人分支**，
 > 不再跟随上游更新。安装方式为本地 `link:`，改完文件重启即生效，`pnpm install` 也不会覆盖。
@@ -124,10 +124,10 @@ icon.svg            插件管理页图标（侧栏 glyph 是 client.js 里的内
 
 ```bash
 # 这个分支装在本地目录，改代码不用重新安装
-cd ~/CodeProjects/dsh-lol-worlds && git log --oneline
+cd ~/CodeProjects/dsh-lol-esports && git log --oneline
 
 # 卸载
-dsh plugin --profile desktop remove dsh-lol-worlds
+dsh plugin --profile desktop remove dsh-lol-esports
 ```
 
 改完都要重启 `dsh web`；本地 `link:` 安装则直接改文件、重启即可（客户端 bundle 按文件 mtime 取新 rev）。
