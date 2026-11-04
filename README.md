@@ -36,7 +36,7 @@
 | 项 | 要求 |
 |---|---|
 | DSH | `>= 0.2.1-rc.2 < 0.3.0`（`engines.dsh` 已声明，不满足会被拒绝安装/激活） |
-| 构建 | 不需要，无依赖、无 `prepare`、无打包步骤 |
+| 构建 | 装的时候不用构建：`client.js` 是已打包的产物，仓库里直接带着；改源码才需要 `npm run build` |
 | 网络 | 能访问 `esports-api.lolesports.com`、`feed.lolesports.com`（数据）、`static.lolesports.com`（队标）；直播/回放链接点开后才访问 `youtube.com` / `twitch.tv` / `lolesports.com` |
 
 ## 安装
@@ -75,11 +75,31 @@ dsh plugin --profile desktop add link:$PWD/dsh-lol-esports
 
 ## 开发
 
+源码是 TypeScript + JSX，用 esbuild 打成 `client.js`（DSH 客户端模块格式，产物提交进仓库，所以安装时不跑构建）：
+
 ```bash
-node --check client.js     # 单文件、无构建，语法检查就够
+npm install
+npm run check    # tsc --noEmit
+npm test         # 打包后跑 node:test（模块契约 + 数据层）
+npm run build    # src/main.ts -> client.js
 ```
 
-目录：`index.js`（Host 半侧，空实现）、`client.js`（全部逻辑：接口、面板、槽位注册）、`cordis.patch.yml`（插入 bundle 层）、`locale/*.json`（插件页文案）。
+```
+src/
+├── main.ts       入口：注册到 window.__ModuleLoader__，把宿主注入的 require 里的 React 绑给运行时
+├── panel.ts      inject / apply：注册字典、面板槽位、侧栏图标
+├── ui.tsx        React 组件（赛程卡片、详情、实时条、问 AI、整届聊天）
+├── api.ts        赛程 / 详情 / 局内实时三套接口与规范化
+├── format.ts     日期、阶段名、提示词、选手名
+├── links.ts      回放与直播地址
+├── i18n.ts       zh / en 字典
+├── css.ts        样式字符串
+├── constants.ts  接口、ID、定时参数
+├── runtime.ts    延迟绑定的 h()，JSX 编译到它
+└── types.ts      领域类型 + 宿主 ctx 接口
+```
+
+React 只能从宿主注入的 `require('react')` 拿，不能静态 import——否则模块会在 factory 之外求值，那时拿不到 DSH 的 `require`。`src/runtime.ts` 就是为此存在的：`factory` 里 `setReact(require('react'))`，组件通过 `h()` 建元素。
 
 ## 许可与致谢
 

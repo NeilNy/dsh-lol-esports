@@ -53,5 +53,18 @@
     "league-of-legends",
     "esports",
     "worlds"
-  ]
+  ],
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "esbuild": "^0.28.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "^7.0.2"
+  },
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --format=iife --target=es2022 --jsx-factory=h --legal-comments=none --outfile=client.js",
+    "check": "tsc --noEmit",
+    "pretest": "npm run build && esbuild src/api.ts src/format.ts --bundle --format=esm --outdir=.tmp --log-level=warning",
+    "test": "node --test"
+  }
 }
