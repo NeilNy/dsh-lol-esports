@@ -37,5 +37,21 @@
         "@deepseek-ai/dsh-client-locale"
       ]
     }
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeilNy/dsh-lol-esports.git"
+  },
+  "homepage": "https://github.com/NeilNy/dsh-lol-esports#readme",
+  "bugs": {
+    "url": "https://github.com/NeilNy/dsh-lol-esports/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "league-of-legends",
+    "esports",
+    "worlds"
+  ]
 }
