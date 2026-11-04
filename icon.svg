@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Worlds Companion">
+  <defs>
+    <linearGradient id="lol-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f2027"/>
+      <stop offset="1" stop-color="#0a1428"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="64" height="64" rx="16" fill="url(#lol-bg)"/>
+  <circle cx="32" cy="26" r="17" fill="#c8aa6e" opacity="0.10"/>
+  <g fill="none" stroke="#c8aa6e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 15h16v10a8 8 0 0 1-16 0V15z"/>
+    <path d="M24 18h-5v2.5a5.5 5.5 0 0 0 5 5.47"/>
+    <path d="M40 18h5v2.5a5.5 5.5 0 0 1-5 5.47"/>
+    <path d="M32 33v7"/>
+    <path d="M25 47h14"/>
+    <path d="M27 47v-2.5a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3V47"/>
+  </g>
+  <circle cx="32" cy="21" r="2.2" fill="#c8aa6e"/>
+</svg>
