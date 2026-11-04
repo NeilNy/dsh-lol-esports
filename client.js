@@ -31,8 +31,8 @@ window.__ModuleLoader__.load({
     // ---------------------------------------------------------------- locales
 
     const zh = {
-      'panel': 'S 赛',
-      'title': 'S 赛观赛助手',
+      'panel': '比赛',
+      'title': '比赛',
       'intro': '全球总决赛赛程与赛果，一键跳转观赛，也可以让我陪你聊比赛。',
       'tab.label': '视图',
       'tab.schedule': '赛程',
@@ -113,8 +113,8 @@ window.__ModuleLoader__.load({
     };
 
     const en = {
-      'panel': 'Worlds',
-      'title': 'Worlds Companion',
+      'panel': 'Matches',
+      'title': 'Matches',
       'intro': 'World Championship schedule and results, one click to the stream, and an AI that watches along with you.',
       'tab.label': 'Views',
       'tab.schedule': 'Schedule',
