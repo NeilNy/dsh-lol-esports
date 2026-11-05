@@ -484,7 +484,6 @@ function MatchCard(props: CardProps) {
             <TeamMark team={home} />
             <span className="lol-teamText">
               <b className="lol-code">{home.code}</b>
-              {home.name !== '' && <span className="lol-name" title={home.name}>{home.name}</span>}
             </span>
           </div>
           <div className="lol-score">
@@ -493,7 +492,6 @@ function MatchCard(props: CardProps) {
           <div className={`lol-side lol-side--away${winner === 0 ? ' lol-side--lost' : ''}`}>
             <span className="lol-teamText">
               <b className="lol-code">{away.code}</b>
-              {away.name !== '' && <span className="lol-name" title={away.name}>{away.name}</span>}
             </span>
             <TeamMark team={away} />
           </div>

@@ -37,7 +37,6 @@ export const CSS = [
       '.lol-side--lost{opacity:.6}',
       '.lol-teamText{display:flex;flex-direction:column;min-width:0}',
       '.lol-code{font-size:14px;line-height:20px;font-weight:600;letter-spacing:.02em}',
-      '.lol-name{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;line-height:16px;color:var(--dsw-alias-label-tertiary)}',
       '.lol-mark{flex:none;width:28px;height:28px;border-radius:50%;corner-shape:round;object-fit:contain;background:var(--dsw-alias-bg-layer-2)}',
       '.lol-mark--text{display:flex;align-items:center;justify-content:center;font-size:9px;line-height:12px;font-weight:600;color:var(--dsw-alias-label-secondary);letter-spacing:.02em}',
       '.lol-score{min-width:56px;text-align:center;font-size:18px;line-height:26px;font-weight:600;font-variant-numeric:tabular-nums}',
