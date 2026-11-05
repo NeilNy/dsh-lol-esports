@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { normalizeEvent, normalizeLive } from '../.tmp/api.js';
-import { displayName, formatGold, groupByDay, orderDayGroups } from '../.tmp/format.js';
+import { anchorDayIndex, displayName, formatGold, groupByDay, orderDayGroups } from '../.tmp/format.js';
 
 const event = (state, bestOf, homeWins, awayWins) => normalizeEvent({
   state,
@@ -68,7 +68,7 @@ test('an all-zero frame is hidden once it is stale', () => {
   assert.equal(normalizeLive(stale), null);
 });
 
-test('the merged list starts with today, then upcoming, then past', () => {
+test('the timeline runs past -> today -> future', () => {
   const at = (iso) => ({ id: iso, start: new Date(iso), state: 'completed', stage: '', bestOf: 1, teams: [] });
   const groups = groupByDay([
     at('2026-11-03T10:00:00+08:00'),
@@ -78,5 +78,9 @@ test('the merged list starts with today, then upcoming, then past', () => {
     at('2026-11-07T10:00:00+08:00'),
   ]);
   const ordered = orderDayGroups(groups, new Date('2026-11-05T12:00:00+08:00'));
-  assert.deepEqual(ordered.map(group => group.key), ['2026-11-5', '2026-11-7', '2026-11-4', '2026-11-3']);
+  assert.deepEqual(ordered.map(group => group.key), ['2026-11-3', '2026-11-4', '2026-11-5', '2026-11-7']);
+  // The panel opens on today, or on the next match day when today is empty.
+  assert.equal(anchorDayIndex(ordered, new Date('2026-11-05T12:00:00+08:00')), 2);
+  assert.equal(anchorDayIndex(ordered, new Date('2026-11-06T12:00:00+08:00')), 3);
+  assert.equal(anchorDayIndex(ordered, new Date('2026-11-20T12:00:00+08:00')), 3);
 });

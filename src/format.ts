@@ -29,16 +29,27 @@ export interface DayGroup {
 }
 
 /**
- * Day groups for the merged list: today first (played or not), then upcoming
- * days in order, then earlier days newest-first.
+ * Day groups as one chronological timeline: earlier match days on top, today in
+ * the middle, upcoming days below. The panel scrolls today's group into view on
+ * open, so scrolling up walks back through history and down walks forward.
  */
 export function orderDayGroups(groups: DayGroup[], now: Date = new Date()): DayGroup[] {
   const todayStart = startOfDay(now).getTime();
   const stamped = groups.map(group => ({ group, day: startOfDay(group.date).getTime() }));
+  const past = stamped.filter(item => item.day < todayStart).sort((a, b) => a.day - b.day);
   const today = stamped.filter(item => item.day === todayStart);
   const future = stamped.filter(item => item.day > todayStart).sort((a, b) => a.day - b.day);
-  const past = stamped.filter(item => item.day < todayStart).sort((a, b) => b.day - a.day);
-  return [...today, ...future, ...past].map(item => item.group);
+  return [...past, ...today, ...future].map(item => item.group);
+}
+
+/** Where the timeline should open: today, else the next match day, else the last one. */
+export function anchorDayIndex(groups: DayGroup[], now: Date = new Date()): number {
+  if (groups.length === 0) return -1;
+  const todayStart = startOfDay(now).getTime();
+  const exact = groups.findIndex(group => startOfDay(group.date).getTime() === todayStart);
+  if (exact !== -1) return exact;
+  const next = groups.findIndex(group => startOfDay(group.date).getTime() > todayStart);
+  return next !== -1 ? next : groups.length - 1;
 }
 
 export function groupByDay(events: MatchEvent[]): DayGroup[] {

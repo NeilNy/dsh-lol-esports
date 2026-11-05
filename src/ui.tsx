@@ -9,6 +9,7 @@ import {
   formatDay,
   formatGold,
   groupByDay,
+  anchorDayIndex,
   orderDayGroups,
   resolveStageScope,
   resolveTodayScope,
@@ -528,6 +529,9 @@ export function WorldsPage(props: PageProps) {
   /** Watch links follow the interface language, so read it on every render. */
   const lang = props.getLang();
   const mounted = useRef(true);
+  const scroller = useRef<any>(null);
+  const anchorSection = useRef<any>(null);
+  const jumped = useRef(false);
   const [stage, setStage] = useState('');
   const [status, setStatus] = useState('loading');
   const [events, setEvents] = useState<MatchEvent[]>([]);
@@ -606,6 +610,21 @@ export function WorldsPage(props: PageProps) {
   const stageScope = useMemo(() => resolveStageScope(edition, stage), [edition, stage]);
   const digestReady = todayScope !== null || stageScope.stage !== '';
 
+  /** Open on today's group instead of the top of the timeline. */
+  useEffect(() => {
+    if (jumped.current || status !== 'ready') return;
+    const el = scroller.current;
+    const target = anchorSection.current;
+    if (el === null || target === null) return;
+    const delta = target.getBoundingClientRect().top - el.getBoundingClientRect().top;
+    if (Number.isFinite(delta)) el.scrollTop += delta;
+    jumped.current = true;
+  }, [status, groups.length, stage]);
+
+  useEffect(() => {
+    jumped.current = false;
+  }, [stage]);
+
   const submitAsk = useCallback(async (match: MatchEvent, question: string) => {
     setAsk({ id: match.id, pending: true, error: null });
     const result = await props.askMatch(match, question, year);
@@ -647,6 +666,7 @@ export function WorldsPage(props: PageProps) {
     />
   );
 
+  const anchorIndex = useMemo(() => anchorDayIndex(groups), [groups]);
   const summary = t('summary', { done: completed.length, open: upcoming.length + live.length });
   const noEdition = status === 'ready' && edition.length === 0;
 
@@ -701,7 +721,7 @@ export function WorldsPage(props: PageProps) {
           )}
         </div>
       </div>
-      <div className="lol-scroll">
+      <div className="lol-scroll" ref={scroller}>
         <div className="lol-scrollInner">
           {digestOpen && (
             <DigestAsk
@@ -722,8 +742,12 @@ export function WorldsPage(props: PageProps) {
               </button>
             </div>
           )}
-          {groups.map(group => (
-            <section key={group.key} className="lol-day">
+          {groups.map((group, index) => (
+            <section
+              key={group.key}
+              className="lol-day"
+              ref={index === anchorIndex ? anchorSection : undefined}
+            >
               <h2 className="lol-dayLabel">{formatDay(group.date, t)}</h2>
               {group.items.map(renderCard)}
             </section>

@@ -38,10 +38,18 @@
   function orderDayGroups(groups, now = /* @__PURE__ */ new Date()) {
     const todayStart = startOfDay(now).getTime();
     const stamped = groups.map((group) => ({ group, day: startOfDay(group.date).getTime() }));
+    const past = stamped.filter((item) => item.day < todayStart).sort((a, b) => a.day - b.day);
     const today = stamped.filter((item) => item.day === todayStart);
     const future = stamped.filter((item) => item.day > todayStart).sort((a, b) => a.day - b.day);
-    const past = stamped.filter((item) => item.day < todayStart).sort((a, b) => b.day - a.day);
-    return [...today, ...future, ...past].map((item) => item.group);
+    return [...past, ...today, ...future].map((item) => item.group);
+  }
+  function anchorDayIndex(groups, now = /* @__PURE__ */ new Date()) {
+    if (groups.length === 0) return -1;
+    const todayStart = startOfDay(now).getTime();
+    const exact = groups.findIndex((group) => startOfDay(group.date).getTime() === todayStart);
+    if (exact !== -1) return exact;
+    const next = groups.findIndex((group) => startOfDay(group.date).getTime() > todayStart);
+    return next !== -1 ? next : groups.length - 1;
   }
   function groupByDay(events) {
     const groups = [];
@@ -1016,6 +1024,9 @@
     const { useState, useEffect, useCallback, useMemo, useRef } = getReact();
     const lang = props.getLang();
     const mounted = useRef(true);
+    const scroller = useRef(null);
+    const anchorSection = useRef(null);
+    const jumped = useRef(false);
     const [stage, setStage] = useState("");
     const [status, setStatus] = useState("loading");
     const [events, setEvents] = useState([]);
@@ -1087,6 +1098,18 @@
     const todayScope = useMemo(() => resolveTodayScope(edition), [edition]);
     const stageScope = useMemo(() => resolveStageScope(edition, stage), [edition, stage]);
     const digestReady = todayScope !== null || stageScope.stage !== "";
+    useEffect(() => {
+      if (jumped.current || status !== "ready") return;
+      const el = scroller.current;
+      const target = anchorSection.current;
+      if (el === null || target === null) return;
+      const delta = target.getBoundingClientRect().top - el.getBoundingClientRect().top;
+      if (Number.isFinite(delta)) el.scrollTop += delta;
+      jumped.current = true;
+    }, [status, groups.length, stage]);
+    useEffect(() => {
+      jumped.current = false;
+    }, [stage]);
     const submitAsk = useCallback(async (match, question) => {
       setAsk({ id: match.id, pending: true, error: null });
       const result = await props.askMatch(match, question, year);
@@ -1128,6 +1151,7 @@
         askError: ask.id === match.id ? ask.error : null
       }
     );
+    const anchorIndex = useMemo(() => anchorDayIndex(groups), [groups]);
     const summary = t("summary", { done: completed.length, open: upcoming.length + live.length });
     const noEdition = status === "ready" && edition.length === 0;
     return /* @__PURE__ */ h("div", { className: "lol-page" }, /* @__PURE__ */ h("div", { className: "lol-head" }, /* @__PURE__ */ h("div", { className: "lol-headInner" }, /* @__PURE__ */ h("div", { className: "lol-titleRow" }, /* @__PURE__ */ h("div", { className: "lol-heading" }, /* @__PURE__ */ h("h1", { className: "lol-title" }, t("title")), /* @__PURE__ */ h("p", { className: "lol-sub" }, edition.length > 0 ? `${t("edition", { year })} \xB7 ${summary}` : t("intro"))), /* @__PURE__ */ h("div", { className: "lol-toolbar" }, digestReady && /* @__PURE__ */ h(
@@ -1160,7 +1184,7 @@
         onClick: () => setStage(item.key)
       },
       item.label
-    ))))), /* @__PURE__ */ h("div", { className: "lol-scroll" }, /* @__PURE__ */ h("div", { className: "lol-scrollInner" }, digestOpen && /* @__PURE__ */ h(
+    ))))), /* @__PURE__ */ h("div", { className: "lol-scroll", ref: scroller }, /* @__PURE__ */ h("div", { className: "lol-scrollInner" }, digestOpen && /* @__PURE__ */ h(
       DigestAsk,
       {
         t,
@@ -1174,7 +1198,16 @@
       }
     ), status === "loading" && /* @__PURE__ */ h("p", { className: "lol-hint" }, t("loading")), error !== null && /* @__PURE__ */ h("div", { className: "lol-errorRow", role: "alert" }, /* @__PURE__ */ h("span", null, t("error")), /* @__PURE__ */ h("button", { type: "button", className: "lol-btn", onClick: () => {
       void load({ force: true });
-    } }, t("retry"))), groups.map((group) => /* @__PURE__ */ h("section", { key: group.key, className: "lol-day" }, /* @__PURE__ */ h("h2", { className: "lol-dayLabel" }, formatDay(group.date, t)), group.items.map(renderCard))), status === "ready" && groups.length === 0 && /* @__PURE__ */ h("div", { className: "lol-empty" }, /* @__PURE__ */ h("p", { className: "lol-emptyTitle" }, noEdition ? t("empty.offSeason") : t("empty")), /* @__PURE__ */ h(
+    } }, t("retry"))), groups.map((group, index) => /* @__PURE__ */ h(
+      "section",
+      {
+        key: group.key,
+        className: "lol-day",
+        ref: index === anchorIndex ? anchorSection : void 0
+      },
+      /* @__PURE__ */ h("h2", { className: "lol-dayLabel" }, formatDay(group.date, t)),
+      group.items.map(renderCard)
+    )), status === "ready" && groups.length === 0 && /* @__PURE__ */ h("div", { className: "lol-empty" }, /* @__PURE__ */ h("p", { className: "lol-emptyTitle" }, noEdition ? t("empty.offSeason") : t("empty")), /* @__PURE__ */ h(
       "a",
       {
         className: "lol-btn",
