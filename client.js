@@ -397,6 +397,115 @@
     "time.tomorrow": "Tomorrow"
   };
 
+  // src/css.ts
+  var CSS = [
+    ".lol-page{box-sizing:border-box;display:flex;flex-direction:column;height:100%;min-height:0;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-base);font-size:14px;line-height:1.6}",
+    ".lol-head{flex:none;padding:28px clamp(24px,4vw,48px) 0}",
+    "[data-platform=darwin] .lol-head{padding-top:calc(28px + var(--dsh-frame-top-clearance,0px))}",
+    ".lol-headInner{display:flex;flex-direction:column;gap:14px;max-width:960px;margin:0 auto}",
+    ".lol-titleRow{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}",
+    ".lol-heading{min-width:0}",
+    ".lol-title{margin:0;font-size:20px;line-height:28px;font-weight:500}",
+    ".lol-sub{margin:4px 0 0;font-size:13px;line-height:20px;color:var(--dsw-alias-label-secondary)}",
+    ".lol-toolbar{display:flex;align-items:center;gap:8px;margin-left:auto}",
+    ".lol-tabs{display:flex;gap:4px}",
+    ".lol-tab{font-family:inherit;font-size:13px;line-height:20px;padding:4px 12px;border-radius:var(--dsw-radius-sm);border:.5px solid transparent;background:0 0;color:var(--dsw-alias-label-secondary);cursor:pointer}",
+    ".lol-tab:hover{background:var(--dsw-alias-interactive-bg-hover)}",
+    ".lol-tab[aria-selected=true]{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-border-l2)}",
+    ".lol-chips{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:4px}",
+    ".lol-chip{font-family:inherit;font-size:12px;line-height:18px;padding:3px 9px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l2);background:0 0;color:var(--dsw-alias-label-secondary);cursor:pointer}",
+    ".lol-chip:hover:not(:disabled){color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}",
+    ".lol-chip[aria-pressed=true]{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-border-l3)}",
+    ".lol-chip:disabled{opacity:.5;cursor:not-allowed}",
+    ".lol-scroll{flex:1;min-height:0;overflow:auto;scrollbar-gutter:stable;--dsh-scrollbar-width:9px;--dsh-scrollbar-thumb-border:2px}",
+    ".lol-scrollInner{display:flex;flex-direction:column;gap:20px;max-width:960px;margin:0 auto;padding:20px clamp(24px,4vw,48px) 48px}",
+    ".lol-day{display:flex;flex-direction:column;gap:8px}",
+    ".lol-dayLabel{position:sticky;top:0;z-index:1;margin:0;padding:4px 0;background:var(--dsw-alias-bg-base);font-size:12px;line-height:18px;font-weight:500;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-card{display:flex;flex-direction:column;gap:10px;padding:12px 16px;background:var(--dsw-alias-bg-layer-1);border:.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-md)}",
+    ".lol-card[data-state=inProgress]{border-color:var(--dsw-alias-state-error-primary)}",
+    ".lol-cardTop{display:flex;align-items:center;gap:8px;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-bo{font-variant-numeric:tabular-nums}",
+    ".lol-badge{display:inline-flex;align-items:center;gap:4px;padding:0 6px;border-radius:var(--dsw-radius-xs);background:var(--dsw-alias-bg-layer-2);font-size:11px;line-height:18px}",
+    ".lol-badge--live{color:var(--dsw-alias-state-error-primary)}",
+    '.lol-badge--live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;corner-shape:round;background:currentColor}',
+    ".lol-clock{margin-left:auto;font-variant-numeric:tabular-nums}",
+    ".lol-cardMain{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}",
+    ".lol-sides{display:grid;grid-template-columns:minmax(0,150px) auto minmax(0,150px);align-items:center;gap:12px;min-width:0}",
+    ".lol-side{display:flex;align-items:center;gap:8px;min-width:0}",
+    ".lol-side--home{justify-content:flex-end;text-align:right}",
+    ".lol-side--lost{opacity:.6}",
+    ".lol-teamText{display:flex;flex-direction:column;min-width:0}",
+    ".lol-code{font-size:14px;line-height:20px;font-weight:600;letter-spacing:.02em}",
+    ".lol-mark{flex:none;width:28px;height:28px;border-radius:50%;corner-shape:round;object-fit:contain;background:var(--dsw-alias-bg-layer-2)}",
+    ".lol-mark--text{display:flex;align-items:center;justify-content:center;font-size:9px;line-height:12px;font-weight:600;color:var(--dsw-alias-label-secondary);letter-spacing:.02em}",
+    ".lol-score{min-width:56px;text-align:center;font-size:18px;line-height:26px;font-weight:600;font-variant-numeric:tabular-nums}",
+    ".lol-card[data-state=unstarted] .lol-score{font-size:12px;line-height:26px;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;margin-left:auto}",
+    ".lol-btn{display:inline-flex;align-items:center;gap:4px;font-family:inherit;font-size:12px;line-height:18px;padding:4px 10px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l2);background:0 0;color:var(--dsw-alias-label-secondary);cursor:pointer;text-decoration:none}",
+    ".lol-btn:hover:not(:disabled){color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}",
+    ".lol-btn[aria-expanded=true]{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-border-l3)}",
+    ".lol-btn:disabled{opacity:.5;cursor:not-allowed}",
+    ".lol-btn--primary{padding:4px 12px;background:var(--dsw-alias-button-primary-fill);border-color:transparent;color:var(--dsw-alias-label-primary-foreground)}",
+    ".lol-btn--primary:hover:not(:disabled){background:var(--dsw-alias-button-primary-hover);color:var(--dsw-alias-label-primary-foreground)}",
+    ".lol-detail{display:flex;flex-direction:column;gap:12px;padding-top:10px;border-top:.5px solid var(--dsw-alias-border-l3)}",
+    ".lol-section{display:flex;flex-direction:column;gap:6px}",
+    ".lol-sectionTitle{margin:0;font-size:12px;line-height:18px;font-weight:500;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-links{display:flex;flex-wrap:wrap;gap:6px}",
+    ".lol-games{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}",
+    ".lol-game{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;line-height:18px;color:var(--dsw-alias-label-secondary)}",
+    ".lol-gameNo{min-width:64px;color:var(--dsw-alias-label-primary);font-variant-numeric:tabular-nums}",
+    ".lol-gameSides{font-variant-numeric:tabular-nums}",
+    ".lol-gameLinks{display:flex;gap:6px;margin-left:auto}",
+    ".lol-digest{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-md);background:var(--dsw-alias-bg-layer-1)}",
+    ".lol-digestTop{display:flex;flex-wrap:wrap;align-items:center;gap:8px}",
+    ".lol-digestTitle{margin:0;font-size:13px;line-height:20px;font-weight:500}",
+    ".lol-digestScopes{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}",
+    ".lol-ask{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-bg-layer-2)}",
+    ".lol-askQuick{display:flex;flex-wrap:wrap;gap:6px}",
+    ".lol-askInput{box-sizing:border-box;width:100%;min-height:56px;padding:8px 10px;border:.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-family:inherit;font-size:13px;line-height:20px;resize:vertical}",
+    ".lol-askFoot{display:flex;flex-wrap:wrap;align-items:center;gap:8px}",
+    ".lol-hint{margin:0;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary);flex:1;min-width:160px}",
+    ".lol-error{margin:0;font-size:12px;line-height:18px;color:var(--dsw-alias-state-error-primary)}",
+    ".lol-errorRow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;line-height:20px;color:var(--dsw-alias-state-error-primary)}",
+    ".lol-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:48px 20px;text-align:center;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-emptyTitle{margin:0;font-size:14px;line-height:22px;color:var(--dsw-alias-label-secondary)}",
+    ".lol-tab:focus-visible,.lol-chip:focus-visible,.lol-btn:focus-visible,.lol-askInput:focus-visible{outline:2px solid var(--dsw-focus-ring-color);outline-offset:1px}",
+    ".lol-live{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-bg-layer-2)}",
+    ".lol-liveTop{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}",
+    ".lol-liveKills{display:flex;align-items:baseline;gap:8px;font-size:20px;line-height:26px;font-weight:600;font-variant-numeric:tabular-nums}",
+    ".lol-liveTeamCode{font-size:12px;line-height:18px;font-weight:500;letter-spacing:.02em;color:var(--dsw-alias-label-secondary)}",
+    ".lol-liveMeta{display:flex;flex-wrap:wrap;gap:4px 14px;margin-left:auto;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}",
+    ".lol-liveMetric b{font-weight:500;color:var(--dsw-alias-label-primary)}",
+    ".lol-liveLag{font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-liveFinished{color:var(--dsw-alias-label-tertiary)}",
+    ".lol-roll{display:inline-block;animation:lol-roll-in .3s cubic-bezier(.22,.61,.36,1)}",
+    "@keyframes lol-roll-in{from{transform:translateY(.42em);opacity:.2}to{transform:none;opacity:1}}",
+    ".lol-livePlayers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;padding-top:8px;border-top:.5px solid var(--dsw-alias-border-l3)}",
+    ".lol-liveTeam{display:flex;flex-direction:column;gap:2px;min-width:0}",
+    ".lol-liveKillLabel{font-size:11px;line-height:16px;letter-spacing:.02em;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-livePlayer{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;font-size:11px;line-height:16px;color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums}",
+    ".lol-liveName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+    ".lol-liveKda,.lol-liveCs{color:var(--dsw-alias-label-primary)}",
+    "@media (max-width:640px){.lol-livePlayers{grid-template-columns:minmax(0,1fr)}}",
+    "@media (prefers-reduced-motion:reduce){.lol-page *{transition:none!important;animation:none!important}}"
+  ].join("");
+
+  // src/styles.ts
+  var STYLE_ID = "dsh-lol-esports-css";
+  function ensureStyles() {
+    if (typeof document === "undefined") return;
+    const existing = document.getElementById(STYLE_ID);
+    if (existing !== null) {
+      if (existing.textContent !== CSS) existing.textContent = CSS;
+      return;
+    }
+    const tag = document.createElement("style");
+    tag.id = STYLE_ID;
+    tag.textContent = CSS;
+    const host = document.head ?? document.documentElement;
+    if (host !== void 0 && host !== null) host.appendChild(tag);
+  }
+
   // src/links.ts
   function localeGroup(locale) {
     const value = typeof locale === "string" ? locale.toLowerCase() : "";
@@ -636,122 +745,12 @@
     return create(type, props, ...children);
   }
 
-  // src/css.ts
-  var CSS = [
-    ".lol-page{box-sizing:border-box;display:flex;flex-direction:column;height:100%;min-height:0;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-base);font-size:14px;line-height:1.6}",
-    ".lol-head{flex:none;padding:28px clamp(24px,4vw,48px) 0}",
-    "[data-platform=darwin] .lol-head{padding-top:calc(28px + var(--dsh-frame-top-clearance,0px))}",
-    ".lol-headInner{display:flex;flex-direction:column;gap:14px;max-width:960px;margin:0 auto}",
-    ".lol-titleRow{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}",
-    ".lol-heading{min-width:0}",
-    ".lol-title{margin:0;font-size:20px;line-height:28px;font-weight:500}",
-    ".lol-sub{margin:4px 0 0;font-size:13px;line-height:20px;color:var(--dsw-alias-label-secondary)}",
-    ".lol-toolbar{display:flex;align-items:center;gap:8px;margin-left:auto}",
-    ".lol-tabs{display:flex;gap:4px}",
-    ".lol-tab{font-family:inherit;font-size:13px;line-height:20px;padding:4px 12px;border-radius:var(--dsw-radius-sm);border:.5px solid transparent;background:0 0;color:var(--dsw-alias-label-secondary);cursor:pointer}",
-    ".lol-tab:hover{background:var(--dsw-alias-interactive-bg-hover)}",
-    ".lol-tab[aria-selected=true]{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-border-l2)}",
-    ".lol-chips{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:4px}",
-    ".lol-chip{font-family:inherit;font-size:12px;line-height:18px;padding:3px 9px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l2);background:0 0;color:var(--dsw-alias-label-secondary);cursor:pointer}",
-    ".lol-chip:hover:not(:disabled){color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}",
-    ".lol-chip[aria-pressed=true]{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-border-l3)}",
-    ".lol-chip:disabled{opacity:.5;cursor:not-allowed}",
-    ".lol-scroll{flex:1;min-height:0;overflow:auto;scrollbar-gutter:stable;--dsh-scrollbar-width:9px;--dsh-scrollbar-thumb-border:2px}",
-    ".lol-scrollInner{display:flex;flex-direction:column;gap:20px;max-width:960px;margin:0 auto;padding:20px clamp(24px,4vw,48px) 48px}",
-    ".lol-day{display:flex;flex-direction:column;gap:8px}",
-    ".lol-dayLabel{position:sticky;top:0;z-index:1;margin:0;padding:4px 0;background:var(--dsw-alias-bg-base);font-size:12px;line-height:18px;font-weight:500;color:var(--dsw-alias-label-tertiary)}",
-    ".lol-card{display:flex;flex-direction:column;gap:10px;padding:12px 16px;background:var(--dsw-alias-bg-layer-1);border:.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-md)}",
-    ".lol-card[data-state=inProgress]{border-color:var(--dsw-alias-state-error-primary)}",
-    ".lol-cardTop{display:flex;align-items:center;gap:8px;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)}",
-    ".lol-bo{font-variant-numeric:tabular-nums}",
-    ".lol-badge{display:inline-flex;align-items:center;gap:4px;padding:0 6px;border-radius:var(--dsw-radius-xs);background:var(--dsw-alias-bg-layer-2);font-size:11px;line-height:18px}",
-    ".lol-badge--live{color:var(--dsw-alias-state-error-primary)}",
-    '.lol-badge--live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;corner-shape:round;background:currentColor}',
-    ".lol-clock{margin-left:auto;font-variant-numeric:tabular-nums}",
-    ".lol-cardMain{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}",
-    ".lol-sides{display:grid;grid-template-columns:minmax(0,150px) auto minmax(0,150px);align-items:center;gap:12px;min-width:0}",
-    ".lol-side{display:flex;align-items:center;gap:8px;min-width:0}",
-    ".lol-side--home{justify-content:flex-end;text-align:right}",
-    ".lol-side--lost{opacity:.6}",
-    ".lol-teamText{display:flex;flex-direction:column;min-width:0}",
-    ".lol-code{font-size:14px;line-height:20px;font-weight:600;letter-spacing:.02em}",
-    ".lol-mark{flex:none;width:28px;height:28px;border-radius:50%;corner-shape:round;object-fit:contain;background:var(--dsw-alias-bg-layer-2)}",
-    ".lol-mark--text{display:flex;align-items:center;justify-content:center;font-size:9px;line-height:12px;font-weight:600;color:var(--dsw-alias-label-secondary);letter-spacing:.02em}",
-    ".lol-score{min-width:56px;text-align:center;font-size:18px;line-height:26px;font-weight:600;font-variant-numeric:tabular-nums}",
-    ".lol-card[data-state=unstarted] .lol-score{font-size:12px;line-height:26px;color:var(--dsw-alias-label-tertiary)}",
-    ".lol-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;margin-left:auto}",
-    ".lol-btn{display:inline-flex;align-items:center;gap:4px;font-family:inherit;font-size:12px;line-height:18px;padding:4px 10px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l2);background:0 0;color:var(--dsw-alias-label-secondary);cursor:pointer;text-decoration:none}",
-    ".lol-btn:hover:not(:disabled){color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}",
-    ".lol-btn[aria-expanded=true]{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-border-l3)}",
-    ".lol-btn:disabled{opacity:.5;cursor:not-allowed}",
-    ".lol-btn--primary{padding:4px 12px;background:var(--dsw-alias-button-primary-fill);border-color:transparent;color:var(--dsw-alias-label-primary-foreground)}",
-    ".lol-btn--primary:hover:not(:disabled){background:var(--dsw-alias-button-primary-hover);color:var(--dsw-alias-label-primary-foreground)}",
-    ".lol-detail{display:flex;flex-direction:column;gap:12px;padding-top:10px;border-top:.5px solid var(--dsw-alias-border-l3)}",
-    ".lol-section{display:flex;flex-direction:column;gap:6px}",
-    ".lol-sectionTitle{margin:0;font-size:12px;line-height:18px;font-weight:500;color:var(--dsw-alias-label-tertiary)}",
-    ".lol-links{display:flex;flex-wrap:wrap;gap:6px}",
-    ".lol-games{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}",
-    ".lol-game{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;line-height:18px;color:var(--dsw-alias-label-secondary)}",
-    ".lol-gameNo{min-width:64px;color:var(--dsw-alias-label-primary);font-variant-numeric:tabular-nums}",
-    ".lol-gameSides{font-variant-numeric:tabular-nums}",
-    ".lol-gameLinks{display:flex;gap:6px;margin-left:auto}",
-    ".lol-digest{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-md);background:var(--dsw-alias-bg-layer-1)}",
-    ".lol-digestTop{display:flex;flex-wrap:wrap;align-items:center;gap:8px}",
-    ".lol-digestTitle{margin:0;font-size:13px;line-height:20px;font-weight:500}",
-    ".lol-digestScopes{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}",
-    ".lol-ask{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-bg-layer-2)}",
-    ".lol-askQuick{display:flex;flex-wrap:wrap;gap:6px}",
-    ".lol-askInput{box-sizing:border-box;width:100%;min-height:56px;padding:8px 10px;border:.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-family:inherit;font-size:13px;line-height:20px;resize:vertical}",
-    ".lol-askFoot{display:flex;flex-wrap:wrap;align-items:center;gap:8px}",
-    ".lol-hint{margin:0;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary);flex:1;min-width:160px}",
-    ".lol-error{margin:0;font-size:12px;line-height:18px;color:var(--dsw-alias-state-error-primary)}",
-    ".lol-errorRow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;line-height:20px;color:var(--dsw-alias-state-error-primary)}",
-    ".lol-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:48px 20px;text-align:center;color:var(--dsw-alias-label-tertiary)}",
-    ".lol-emptyTitle{margin:0;font-size:14px;line-height:22px;color:var(--dsw-alias-label-secondary)}",
-    ".lol-tab:focus-visible,.lol-chip:focus-visible,.lol-btn:focus-visible,.lol-askInput:focus-visible{outline:2px solid var(--dsw-focus-ring-color);outline-offset:1px}",
-    ".lol-live{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-bg-layer-2)}",
-    ".lol-liveTop{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}",
-    ".lol-liveKills{display:flex;align-items:baseline;gap:8px;font-size:20px;line-height:26px;font-weight:600;font-variant-numeric:tabular-nums}",
-    ".lol-liveTeamCode{font-size:12px;line-height:18px;font-weight:500;letter-spacing:.02em;color:var(--dsw-alias-label-secondary)}",
-    ".lol-liveMeta{display:flex;flex-wrap:wrap;gap:4px 14px;margin-left:auto;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}",
-    ".lol-liveMetric b{font-weight:500;color:var(--dsw-alias-label-primary)}",
-    ".lol-liveLag{font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-tertiary)}",
-    ".lol-liveFinished{color:var(--dsw-alias-label-tertiary)}",
-    ".lol-roll{display:inline-block;animation:lol-roll-in .3s cubic-bezier(.22,.61,.36,1)}",
-    "@keyframes lol-roll-in{from{transform:translateY(.42em);opacity:.2}to{transform:none;opacity:1}}",
-    ".lol-livePlayers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;padding-top:8px;border-top:.5px solid var(--dsw-alias-border-l3)}",
-    ".lol-liveTeam{display:flex;flex-direction:column;gap:2px;min-width:0}",
-    ".lol-liveKillLabel{font-size:11px;line-height:16px;letter-spacing:.02em;color:var(--dsw-alias-label-tertiary)}",
-    ".lol-livePlayer{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;font-size:11px;line-height:16px;color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums}",
-    ".lol-liveName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
-    ".lol-liveKda,.lol-liveCs{color:var(--dsw-alias-label-primary)}",
-    "@media (max-width:640px){.lol-livePlayers{grid-template-columns:minmax(0,1fr)}}",
-    "@media (prefers-reduced-motion:reduce){.lol-page *{transition:none!important;animation:none!important}}"
-  ].join("");
-
-  // src/styles.ts
-  var STYLE_TAG_ID = "dsh-lol-esports/page.css";
-  function ensureStyles() {
-    if (typeof document === "undefined") return;
-    const selector = `style[data-plugin-css=${JSON.stringify(STYLE_TAG_ID)}]`;
-    const existing = document.querySelector(selector);
-    if (existing !== null) {
-      existing.textContent = CSS;
-      return;
-    }
-    const tag = document.createElement("style");
-    tag.dataset.plugin = "dsh-lol-esports";
-    tag.dataset.pluginCss = STYLE_TAG_ID;
-    tag.textContent = CSS;
-    document.head.appendChild(tag);
-  }
-
   // src/ui.tsx
-  ensureStyles();
   var KIND_LIVE = "inProgress";
   var KIND_DONE = "completed";
   var KIND_UPCOMING = "unstarted";
   function WorldsIcon({ size, active }) {
+    ensureStyles();
     return /* @__PURE__ */ h(
       "svg",
       {
@@ -1004,6 +1003,7 @@
     return /* @__PURE__ */ h("article", { className: "lol-card", "data-state": match.state }, /* @__PURE__ */ h("div", { className: "lol-cardTop" }, match.stage !== "" && /* @__PURE__ */ h("span", { className: "lol-stage" }, stageName(match.stage, t)), /* @__PURE__ */ h("span", { className: "lol-bo" }, t("bo", { n: match.bestOf })), /* @__PURE__ */ h("span", { className: `lol-badge lol-badge--${tone}` }, stateLabel(match.state, t)), /* @__PURE__ */ h("time", { className: "lol-clock", dateTime: match.start.toISOString() }, formatClock(match.start))), /* @__PURE__ */ h("div", { className: "lol-cardMain" }, /* @__PURE__ */ h("div", { className: "lol-sides" }, /* @__PURE__ */ h("div", { className: `lol-side lol-side--home${winner === 1 ? " lol-side--lost" : ""}` }, /* @__PURE__ */ h(TeamMark, { team: home }), /* @__PURE__ */ h("span", { className: "lol-teamText" }, /* @__PURE__ */ h("b", { className: "lol-code" }, home.code))), /* @__PURE__ */ h("div", { className: "lol-score" }, match.state === KIND_UPCOMING ? "VS" : `${home.score} : ${away.score}`), /* @__PURE__ */ h("div", { className: `lol-side lol-side--away${winner === 0 ? " lol-side--lost" : ""}` }, /* @__PURE__ */ h("span", { className: "lol-teamText" }, /* @__PURE__ */ h("b", { className: "lol-code" }, away.code)), /* @__PURE__ */ h(TeamMark, { team: away }))), /* @__PURE__ */ h("div", { className: "lol-actions" }, /* @__PURE__ */ h(LinkButton, { href: done ? SITE_URL : OFFICIAL_URL, label: done ? t("links.official") : t("watch") }), /* @__PURE__ */ h("button", { type: "button", className: "lol-btn", "aria-expanded": askOpen, onClick: () => onAskOpen(!askOpen) }, t("ask")), /* @__PURE__ */ h("button", { type: "button", className: "lol-btn", "aria-expanded": expanded, onClick: onToggle }, expanded ? t("detail.hide") : t("detail")))), match.state === KIND_LIVE && /* @__PURE__ */ h(LiveStrip, { t, match }), askOpen && /* @__PURE__ */ h(AskBox, { t, match, onSubmit: onSubmitAsk, pending: askPending, error: askError }), expanded && /* @__PURE__ */ h(MatchDetail, { t, match, lang }));
   }
   function WorldsPage(props) {
+    ensureStyles();
     const { t } = props;
     const { useState, useEffect, useCallback, useMemo, useRef } = getReact();
     const lang = props.getLang();
@@ -1202,6 +1202,7 @@
     "layout"
   ];
   function apply(ctx) {
+    ensureStyles();
     ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-lol: dictionaries");
     const t = ctx.locale.bind(NS);
     const send = async (text) => {

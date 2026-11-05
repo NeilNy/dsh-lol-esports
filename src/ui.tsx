@@ -29,14 +29,13 @@ import type {
   Translate,
 } from './types';
 
-ensureStyles();
-
 const KIND_LIVE = 'inProgress';
 const KIND_DONE = 'completed';
 const KIND_UPCOMING = 'unstarted';
 
 /** Sidebar glyph: the Worlds trophy at the size the sidebar asks for. */
 export function WorldsIcon({ size, active }: { size: number; active: boolean }) {
+  ensureStyles();
   return (
     <svg
       viewBox="0 0 24 24"
@@ -522,6 +521,7 @@ export interface PageProps {
 
 /** The panel: schedule and results, one card per match. */
 export function WorldsPage(props: PageProps) {
+  ensureStyles();
   const { t } = props;
   const { useState, useEffect, useCallback, useMemo, useRef } = getReact();
   /** Watch links follow the interface language, so read it on every render. */

@@ -12,11 +12,13 @@ function loadPlugin() {
   const windowStub = {
     __ModuleLoader__: { load: (next) => { spec = next; } },
   };
+  const appended = [];
   const documentStub = {
     documentElement: { getAttribute: () => 'zh-CN' },
     querySelector: () => null,
-    createElement: () => ({ dataset: {}, textContent: '' }),
-    head: { appendChild: () => {} },
+    getElementById: () => null,
+    createElement: () => ({ dataset: {}, textContent: '', id: '' }),
+    head: { appendChild: (tag) => { appended.push(tag); } },
   };
   const fn = new Function('window', 'document', 'navigator', source);
   fn(windowStub, documentStub, { language: 'zh-CN' });
@@ -26,7 +28,7 @@ function loadPlugin() {
     if (id === 'react') return React;
     throw new Error(`unexpected require: ${id}`);
   };
-  return { spec, plugin: spec.factory(require) };
+  return { spec, plugin: spec.factory(require), appended };
 }
 
 const t = (key, params) => (params === undefined ? key : `${key}:${JSON.stringify(params)}`);
@@ -55,7 +57,7 @@ test('the bundle registers and exposes the panel contract', () => {
 });
 
 test('apply registers the dictionary, the panel and the sidebar entry', async () => {
-  const { plugin } = loadPlugin();
+  const { plugin, appended } = loadPlugin();
   const registered = [];
   const effects = [];
   const ctx = {
@@ -94,6 +96,11 @@ test('apply registers the dictionary, the panel and the sidebar entry', async ()
   );
   assert.match(html, /lol-page/);
   assert.match(html, /lol-title/);
+
+  // The stylesheet must land in the document as part of mounting the panel,
+  // not only when the bundle happens to be evaluated.
+  const style = appended.find(tag => tag.textContent && tag.textContent.includes('.lol-page{'));
+  assert.ok(style, 'panel stylesheet was not injected');
 
   assert.equal(renderToStaticMarkup(React.createElement(sidebar.component, { size: 18, active: true })).includes('<svg'), true);
 });

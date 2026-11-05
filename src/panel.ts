@@ -1,6 +1,7 @@
 import { PANEL_ID } from './constants';
 import { buildPrompt, describe, mintRequestId } from './format';
 import { NS, en, zh } from './i18n';
+import { ensureStyles } from './styles';
 import { WorldsIcon, WorldsPage } from './ui';
 import type { AskResult, MatchEvent, PanelContext, PanelFace } from './types';
 
@@ -16,6 +17,7 @@ export const inject = [
 ];
 
 export function apply(ctx: PanelContext): void {
+  ensureStyles();
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-lol: dictionaries');
   const t = ctx.locale.bind(NS);
 
