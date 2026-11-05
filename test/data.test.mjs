@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { normalizeEvent, normalizeLive } from '../.tmp/api.js';
-import { displayName, formatGold } from '../.tmp/format.js';
+import { displayName, formatGold, groupByDay, orderDayGroups } from '../.tmp/format.js';
 
 const event = (state, bestOf, homeWins, awayWins) => normalizeEvent({
   state,
@@ -66,4 +66,17 @@ test('an all-zero frame is hidden once it is stale', () => {
   // The same frame an hour later can only be Riot's metadata-only stub.
   const stale = frame({ ...zero, rfc460Timestamp: new Date(Date.now() - 3600 * 1000).toISOString() });
   assert.equal(normalizeLive(stale), null);
+});
+
+test('the merged list starts with today, then upcoming, then past', () => {
+  const at = (iso) => ({ id: iso, start: new Date(iso), state: 'completed', stage: '', bestOf: 1, teams: [] });
+  const groups = groupByDay([
+    at('2026-11-03T10:00:00+08:00'),
+    at('2026-11-04T10:00:00+08:00'),
+    at('2026-11-05T10:00:00+08:00'),
+    at('2026-11-05T20:00:00+08:00'),
+    at('2026-11-07T10:00:00+08:00'),
+  ]);
+  const ordered = orderDayGroups(groups, new Date('2026-11-05T12:00:00+08:00'));
+  assert.deepEqual(ordered.map(group => group.key), ['2026-11-5', '2026-11-7', '2026-11-4', '2026-11-3']);
 });

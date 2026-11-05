@@ -28,6 +28,19 @@ export interface DayGroup {
   items: MatchEvent[];
 }
 
+/**
+ * Day groups for the merged list: today first (played or not), then upcoming
+ * days in order, then earlier days newest-first.
+ */
+export function orderDayGroups(groups: DayGroup[], now: Date = new Date()): DayGroup[] {
+  const todayStart = startOfDay(now).getTime();
+  const stamped = groups.map(group => ({ group, day: startOfDay(group.date).getTime() }));
+  const today = stamped.filter(item => item.day === todayStart);
+  const future = stamped.filter(item => item.day > todayStart).sort((a, b) => a.day - b.day);
+  const past = stamped.filter(item => item.day < todayStart).sort((a, b) => b.day - a.day);
+  return [...today, ...future, ...past].map(item => item.group);
+}
+
 export function groupByDay(events: MatchEvent[]): DayGroup[] {
   const groups: DayGroup[] = [];
   let current: DayGroup | null = null;

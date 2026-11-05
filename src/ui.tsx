@@ -9,6 +9,7 @@ import {
   formatDay,
   formatGold,
   groupByDay,
+  orderDayGroups,
   resolveStageScope,
   resolveTodayScope,
   stageName,
@@ -527,7 +528,6 @@ export function WorldsPage(props: PageProps) {
   /** Watch links follow the interface language, so read it on every render. */
   const lang = props.getLang();
   const mounted = useRef(true);
-  const [tab, setTab] = useState('schedule');
   const [stage, setStage] = useState('');
   const [status, setStatus] = useState('loading');
   const [events, setEvents] = useState<MatchEvent[]>([]);
@@ -593,9 +593,14 @@ export function WorldsPage(props: PageProps) {
       .sort((a: MatchEvent, b: MatchEvent) => b.start.getTime() - a.start.getTime()),
     [filtered],
   );
+  /**
+   * One merged list: every match of the edition, grouped by day, with today's
+   * group first whether or not those matches have been played. Upcoming days
+   * follow in order, then earlier days newest-first.
+   */
   const groups = useMemo(
-    () => groupByDay(tab === 'schedule' ? upcoming : completed),
-    [tab, upcoming, completed],
+    () => orderDayGroups(groupByDay([...filtered].sort((a: MatchEvent, b: MatchEvent) => a.start.getTime() - b.start.getTime()))),
+    [filtered],
   );
   const todayScope = useMemo(() => resolveTodayScope(edition), [edition]);
   const stageScope = useMemo(() => resolveStageScope(edition, stage), [edition, stage]);
@@ -657,20 +662,6 @@ export function WorldsPage(props: PageProps) {
               </p>
             </div>
             <div className="lol-toolbar">
-              <div className="lol-tabs" role="tablist" aria-label={t('tab.label')}>
-                {['schedule', 'result'].map(value => (
-                  <button
-                    key={value}
-                    type="button"
-                    role="tab"
-                    className="lol-tab"
-                    aria-selected={tab === value}
-                    onClick={() => setTab(value)}
-                  >
-                    {t(`tab.${value}`)}
-                  </button>
-                ))}
-              </div>
               {digestReady && (
                 <button
                   type="button"
@@ -731,19 +722,13 @@ export function WorldsPage(props: PageProps) {
               </button>
             </div>
           )}
-          {tab === 'schedule' && live.length > 0 && (
-            <section className="lol-day">
-              <h2 className="lol-dayLabel">{t('state.live')}</h2>
-              {live.map(renderCard)}
-            </section>
-          )}
           {groups.map(group => (
             <section key={group.key} className="lol-day">
               <h2 className="lol-dayLabel">{formatDay(group.date, t)}</h2>
               {group.items.map(renderCard)}
             </section>
           ))}
-          {status === 'ready' && groups.length === 0 && live.length === 0 && (
+          {status === 'ready' && groups.length === 0 && (
             <div className="lol-empty">
               <p className="lol-emptyTitle">{noEdition ? t('empty.offSeason') : t('empty')}</p>
               <a

@@ -35,6 +35,14 @@
   function startOfDay(date) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
+  function orderDayGroups(groups, now = /* @__PURE__ */ new Date()) {
+    const todayStart = startOfDay(now).getTime();
+    const stamped = groups.map((group) => ({ group, day: startOfDay(group.date).getTime() }));
+    const today = stamped.filter((item) => item.day === todayStart);
+    const future = stamped.filter((item) => item.day > todayStart).sort((a, b) => a.day - b.day);
+    const past = stamped.filter((item) => item.day < todayStart).sort((a, b) => b.day - a.day);
+    return [...today, ...future, ...past].map((item) => item.group);
+  }
   function groupByDay(events) {
     const groups = [];
     let current = null;
@@ -1008,7 +1016,6 @@
     const { useState, useEffect, useCallback, useMemo, useRef } = getReact();
     const lang = props.getLang();
     const mounted = useRef(true);
-    const [tab, setTab] = useState("schedule");
     const [stage, setStage] = useState("");
     const [status, setStatus] = useState("loading");
     const [events, setEvents] = useState([]);
@@ -1074,8 +1081,8 @@
       [filtered]
     );
     const groups = useMemo(
-      () => groupByDay(tab === "schedule" ? upcoming : completed),
-      [tab, upcoming, completed]
+      () => orderDayGroups(groupByDay([...filtered].sort((a, b) => a.start.getTime() - b.start.getTime()))),
+      [filtered]
     );
     const todayScope = useMemo(() => resolveTodayScope(edition), [edition]);
     const stageScope = useMemo(() => resolveStageScope(edition, stage), [edition, stage]);
@@ -1123,18 +1130,7 @@
     );
     const summary = t("summary", { done: completed.length, open: upcoming.length + live.length });
     const noEdition = status === "ready" && edition.length === 0;
-    return /* @__PURE__ */ h("div", { className: "lol-page" }, /* @__PURE__ */ h("div", { className: "lol-head" }, /* @__PURE__ */ h("div", { className: "lol-headInner" }, /* @__PURE__ */ h("div", { className: "lol-titleRow" }, /* @__PURE__ */ h("div", { className: "lol-heading" }, /* @__PURE__ */ h("h1", { className: "lol-title" }, t("title")), /* @__PURE__ */ h("p", { className: "lol-sub" }, edition.length > 0 ? `${t("edition", { year })} \xB7 ${summary}` : t("intro"))), /* @__PURE__ */ h("div", { className: "lol-toolbar" }, /* @__PURE__ */ h("div", { className: "lol-tabs", role: "tablist", "aria-label": t("tab.label") }, ["schedule", "result"].map((value) => /* @__PURE__ */ h(
-      "button",
-      {
-        key: value,
-        type: "button",
-        role: "tab",
-        className: "lol-tab",
-        "aria-selected": tab === value,
-        onClick: () => setTab(value)
-      },
-      t(`tab.${value}`)
-    ))), digestReady && /* @__PURE__ */ h(
+    return /* @__PURE__ */ h("div", { className: "lol-page" }, /* @__PURE__ */ h("div", { className: "lol-head" }, /* @__PURE__ */ h("div", { className: "lol-headInner" }, /* @__PURE__ */ h("div", { className: "lol-titleRow" }, /* @__PURE__ */ h("div", { className: "lol-heading" }, /* @__PURE__ */ h("h1", { className: "lol-title" }, t("title")), /* @__PURE__ */ h("p", { className: "lol-sub" }, edition.length > 0 ? `${t("edition", { year })} \xB7 ${summary}` : t("intro"))), /* @__PURE__ */ h("div", { className: "lol-toolbar" }, digestReady && /* @__PURE__ */ h(
       "button",
       {
         type: "button",
@@ -1178,7 +1174,7 @@
       }
     ), status === "loading" && /* @__PURE__ */ h("p", { className: "lol-hint" }, t("loading")), error !== null && /* @__PURE__ */ h("div", { className: "lol-errorRow", role: "alert" }, /* @__PURE__ */ h("span", null, t("error")), /* @__PURE__ */ h("button", { type: "button", className: "lol-btn", onClick: () => {
       void load({ force: true });
-    } }, t("retry"))), tab === "schedule" && live.length > 0 && /* @__PURE__ */ h("section", { className: "lol-day" }, /* @__PURE__ */ h("h2", { className: "lol-dayLabel" }, t("state.live")), live.map(renderCard)), groups.map((group) => /* @__PURE__ */ h("section", { key: group.key, className: "lol-day" }, /* @__PURE__ */ h("h2", { className: "lol-dayLabel" }, formatDay(group.date, t)), group.items.map(renderCard))), status === "ready" && groups.length === 0 && live.length === 0 && /* @__PURE__ */ h("div", { className: "lol-empty" }, /* @__PURE__ */ h("p", { className: "lol-emptyTitle" }, noEdition ? t("empty.offSeason") : t("empty")), /* @__PURE__ */ h(
+    } }, t("retry"))), groups.map((group) => /* @__PURE__ */ h("section", { key: group.key, className: "lol-day" }, /* @__PURE__ */ h("h2", { className: "lol-dayLabel" }, formatDay(group.date, t)), group.items.map(renderCard))), status === "ready" && groups.length === 0 && /* @__PURE__ */ h("div", { className: "lol-empty" }, /* @__PURE__ */ h("p", { className: "lol-emptyTitle" }, noEdition ? t("empty.offSeason") : t("empty")), /* @__PURE__ */ h(
       "a",
       {
         className: "lol-btn",
