@@ -114,6 +114,20 @@ export function mintRequestId(): string {
   return `lol-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+const ROLE_KEYS: Record<string, string> = {
+  top: 'role.top',
+  jungle: 'role.jungle',
+  mid: 'role.mid',
+  bottom: 'role.bottom',
+  support: 'role.support',
+};
+
+/** Riot reports roles as top/jungle/mid/bottom/support; unknown ones stay raw. */
+export function roleLabel(role: string, t: Translate): string {
+  const key = ROLE_KEYS[role];
+  return key === undefined ? role : t(key);
+}
+
 export function stateLabel(state: string, t: Translate): string {
   if (state === 'inProgress') return t('state.live');
   if (state === 'completed') return t('state.done');

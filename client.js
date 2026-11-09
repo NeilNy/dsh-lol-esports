@@ -106,6 +106,17 @@
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
     return `lol-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
   }
+  var ROLE_KEYS = {
+    top: "role.top",
+    jungle: "role.jungle",
+    mid: "role.mid",
+    bottom: "role.bottom",
+    support: "role.support"
+  };
+  function roleLabel(role, t) {
+    const key = ROLE_KEYS[role];
+    return key === void 0 ? role : t(key);
+  }
   function stateLabel(state, t) {
     if (state === "inProgress") return t("state.live");
     if (state === "completed") return t("state.done");
@@ -282,6 +293,13 @@
     "detail.hide": "\u6536\u8D77",
     "ask": "\u95EE AI",
     "games": "\u9010\u5C40",
+    "bp": "\u51FA\u6218\u9635\u5BB9",
+    "bp.empty": "\u8FD9\u4E00\u5C40\u8FD8\u6CA1\u6709\u9635\u5BB9\u6570\u636E\u3002",
+    "role.top": "\u4E0A",
+    "role.jungle": "\u91CE",
+    "role.mid": "\u4E2D",
+    "role.bottom": "\u4E0B",
+    "role.support": "\u8F85",
     "game": "\u7B2C {n} \u5C40",
     "side.blue": "\u84DD\u65B9",
     "side.red": "\u7EA2\u65B9",
@@ -363,6 +381,13 @@
     "detail.hide": "Hide",
     "ask": "Ask AI",
     "games": "Games",
+    "bp": "Draft",
+    "bp.empty": "No draft data for this game yet.",
+    "role.top": "TOP",
+    "role.jungle": "JGL",
+    "role.mid": "MID",
+    "role.bottom": "BOT",
+    "role.support": "SUP",
     "game": "Game {n}",
     "side.blue": "blue",
     "side.red": "red",
@@ -472,6 +497,16 @@
     ".lol-gameNo{min-width:64px;color:var(--dsw-alias-label-primary);font-variant-numeric:tabular-nums}",
     ".lol-gameSides{font-variant-numeric:tabular-nums}",
     ".lol-gameLinks{display:flex;gap:6px;margin-left:auto}",
+    ".lol-draft{flex-basis:100%;display:flex;flex-direction:column;gap:6px;padding:4px 0 2px}",
+    ".lol-draftRow{display:flex;align-items:center;flex-wrap:wrap;gap:10px}",
+    ".lol-draftSide{width:32px;flex:none;font-size:11px;color:var(--dsw-alias-label-tertiary)}",
+    ".lol-draftPick{display:inline-flex;align-items:center;gap:5px;font-size:11px;line-height:16px}",
+    ".lol-draftImg{width:22px;height:22px;border-radius:4px;object-fit:cover;background:var(--dsw-alias-bg-layer-2)}",
+    ".lol-draftRole{color:var(--dsw-alias-label-tertiary)}",
+    ".lol-draftChamp{color:var(--dsw-alias-label-primary)}",
+    ".lol-liveName{display:flex;align-items:center;gap:5px;min-width:0}",
+    ".lol-liveNameText{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+    ".lol-champIcon{flex:none;width:16px;height:16px;border-radius:3px;object-fit:cover;background:var(--dsw-alias-bg-layer-1)}",
     ".lol-digest{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-md);background:var(--dsw-alias-bg-layer-1)}",
     ".lol-digestTop{display:flex;flex-wrap:wrap;align-items:center;gap:8px}",
     ".lol-digestTitle{margin:0;font-size:13px;line-height:20px;font-weight:500}",
@@ -500,7 +535,6 @@
     ".lol-liveTeam{display:flex;flex-direction:column;gap:2px;min-width:0}",
     ".lol-liveKillLabel{font-size:11px;line-height:16px;letter-spacing:.02em;color:var(--dsw-alias-label-tertiary)}",
     ".lol-livePlayer{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;font-size:11px;line-height:16px;color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums}",
-    ".lol-liveName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
     ".lol-liveKda,.lol-liveCs{color:var(--dsw-alias-label-primary)}",
     "@media (max-width:640px){.lol-livePlayers{grid-template-columns:minmax(0,1fr)}}",
     "@media (prefers-reduced-motion:reduce){.lol-page *{transition:none!important;animation:none!important}}"
@@ -651,6 +685,7 @@
         const vods = Array.isArray(game.vods) ? game.vods : [];
         return {
           number: game.number,
+          id: game.id === void 0 || game.id === null ? "" : String(game.id),
           sides: (Array.isArray(game.teams) ? game.teams : []).map((side) => ({
             side: side.side,
             code: teamById.get(String(side.id))?.code ?? "?"
@@ -734,6 +769,53 @@
       if (timer !== null) clearTimeout(timer);
     }
   }
+  var draftCache = /* @__PURE__ */ new Map();
+  function draftPicks(metadata, key) {
+    const list = metadata?.[key]?.participantMetadata;
+    if (!Array.isArray(list)) return [];
+    return list.map((entry) => ({
+      role: typeof entry.role === "string" ? entry.role : "",
+      champion: typeof entry.championId === "string" ? entry.championId : "",
+      player: typeof entry.summonerName === "string" ? entry.summonerName : ""
+    }));
+  }
+  function normalizeDraft(metadata) {
+    const blue = draftPicks(metadata, "blueTeamMetadata");
+    const red = draftPicks(metadata, "redTeamMetadata");
+    if (blue.length === 0 && red.length === 0) return null;
+    return { blue, red };
+  }
+  async function loadDraft(gameId) {
+    if (gameId === "") return null;
+    const cached = draftCache.get(gameId);
+    if (cached !== void 0 && Date.now() - cached.at < 30 * 60 * 1e3) return cached.draft;
+    let payload = null;
+    try {
+      payload = await fetchWindow(gameId, null);
+    } catch {
+      payload = null;
+    }
+    const draft = payload === null ? null : normalizeDraft(payload.gameMetadata);
+    draftCache.set(gameId, { at: Date.now(), draft });
+    return draft;
+  }
+  var DD_BASE = "https://ddragon.leagueoflegends.com/cdn";
+  var DD_FALLBACK = "16.22.1";
+  var championVersion = null;
+  async function championImageUrl(champion) {
+    const id = champion.replace(/[^A-Za-z0-9]/g, "");
+    if (id === "") return null;
+    if (championVersion === null) {
+      try {
+        const response = await fetch(`${DD_BASE}/api/versions.json`);
+        const versions = await response.json();
+        championVersion = Array.isArray(versions) && versions.length > 0 ? String(versions[0]) : DD_FALLBACK;
+      } catch {
+        championVersion = DD_FALLBACK;
+      }
+    }
+    return `${DD_BASE}/${championVersion}/img/champion/${id}.png`;
+  }
   async function loadLiveStats(gameId) {
     const cached = liveStatsCache.get(gameId);
     if (cached !== void 0 && Date.now() - cached.at < LIVE_POLL) return cached.stats;
@@ -796,6 +878,21 @@
       return /* @__PURE__ */ h("span", { className: "lol-mark lol-mark--text", "aria-hidden": "true" }, team.code);
     }
     return /* @__PURE__ */ h("img", { className: "lol-mark", src: team.image, alt: "", loading: "lazy", onError: () => setBroken(true) });
+  }
+  function ChampionIcon({ champion, className }) {
+    const { useState, useEffect } = getReact();
+    const [url, setUrl] = useState(null);
+    useEffect(() => {
+      let cancelled = false;
+      void championImageUrl(champion).then((next) => {
+        if (!cancelled) setUrl(next);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }, [champion]);
+    if (url === null) return /* @__PURE__ */ h("span", { className, "aria-hidden": "true" });
+    return /* @__PURE__ */ h("img", { className, src: url, alt: "", loading: "lazy" });
   }
   function LinkButton({ href, label }) {
     return /* @__PURE__ */ h("a", { className: "lol-btn", href, target: "_blank", rel: "noreferrer noopener" }, label, /* @__PURE__ */ h("span", { "aria-hidden": "true" }, "\u2197"));
@@ -918,6 +1015,10 @@
       pending ? t("ask.sending") : t("ask.send")
     )), error !== null && /* @__PURE__ */ h("p", { className: "lol-error", role: "alert" }, t("ask.failed", { message: error })));
   }
+  function DraftRows({ t, draft }) {
+    const row = (picks, side) => /* @__PURE__ */ h("div", { className: "lol-draftRow", key: side }, /* @__PURE__ */ h("span", { className: "lol-draftSide" }, t(`side.${side}`)), picks.map((pick) => /* @__PURE__ */ h("span", { key: `${side}-${pick.role}-${pick.champion}`, className: "lol-draftPick", title: pick.player }, /* @__PURE__ */ h(ChampionIcon, { champion: pick.champion, className: "lol-draftImg" }), /* @__PURE__ */ h("span", { className: "lol-draftRole" }, roleLabel(pick.role, t)), /* @__PURE__ */ h("span", { className: "lol-draftChamp" }, pick.champion))));
+    return /* @__PURE__ */ h("div", { className: "lol-draft" }, row(draft.blue, "blue"), row(draft.red, "red"));
+  }
   function MatchDetail({ t, match, lang }) {
     const { useState, useEffect } = getReact();
     const [state, setState] = useState({
@@ -937,6 +1038,18 @@
         cancelled = true;
       };
     }, [match.id]);
+    const [openDraft, setOpenDraft] = useState(null);
+    const [drafts, setDrafts] = useState({});
+    const toggleDraft = (gameId) => {
+      if (gameId === "") return;
+      const next = openDraft === gameId ? null : gameId;
+      setOpenDraft(next);
+      if (next !== null && drafts[gameId] === void 0) {
+        void loadDraft(gameId).then((draft) => {
+          setDrafts((current) => ({ ...current, [gameId]: draft }));
+        });
+      }
+    };
     const detail = state.detail;
     const first = detail !== null && detail.games.length > 0 ? detail.games[0] : null;
     const linkLabel = (locale) => localeGroup(locale) === "en" ? t("links.replayEn") : t("links.replay");
@@ -955,7 +1068,17 @@
     if (first !== null) {
       for (const vod of localizedTargets(first.vods, lang)) push(vod.href, linkLabel(vod.locale));
     }
-    return /* @__PURE__ */ h("div", { className: "lol-detail" }, /* @__PURE__ */ h("div", { className: "lol-section" }, /* @__PURE__ */ h("h3", { className: "lol-sectionTitle" }, t("links")), /* @__PURE__ */ h("div", { className: "lol-links" }, links.map((link) => /* @__PURE__ */ h(LinkButton, { key: link.href, href: link.href, label: link.label }))), state.status === "error" && /* @__PURE__ */ h("p", { className: "lol-error", role: "alert" }, t("error"))), detail !== null && detail.games.length > 0 && /* @__PURE__ */ h("div", { className: "lol-section" }, /* @__PURE__ */ h("h3", { className: "lol-sectionTitle" }, t("games")), /* @__PURE__ */ h("ul", { className: "lol-games" }, detail.games.map((game) => /* @__PURE__ */ h("li", { key: game.number, className: "lol-game" }, /* @__PURE__ */ h("span", { className: "lol-gameNo" }, t("game", { n: game.number })), /* @__PURE__ */ h("span", { className: "lol-gameSides" }, game.sides.map((side) => `${side.code} (${t(`side.${side.side}`)})`).join(" vs ")), /* @__PURE__ */ h("span", { className: "lol-gameLinks" }, localizedTargets(game.vods, lang).map((vod) => /* @__PURE__ */ h(LinkButton, { key: vod.href, href: vod.href, label: linkLabel(vod.locale) }))))))));
+    return /* @__PURE__ */ h("div", { className: "lol-detail" }, /* @__PURE__ */ h("div", { className: "lol-section" }, /* @__PURE__ */ h("h3", { className: "lol-sectionTitle" }, t("links")), /* @__PURE__ */ h("div", { className: "lol-links" }, links.map((link) => /* @__PURE__ */ h(LinkButton, { key: link.href, href: link.href, label: link.label }))), state.status === "error" && /* @__PURE__ */ h("p", { className: "lol-error", role: "alert" }, t("error"))), detail !== null && detail.games.length > 0 && /* @__PURE__ */ h("div", { className: "lol-section" }, /* @__PURE__ */ h("h3", { className: "lol-sectionTitle" }, t("games")), /* @__PURE__ */ h("ul", { className: "lol-games" }, detail.games.map((game) => /* @__PURE__ */ h("li", { key: game.number, className: "lol-game" }, /* @__PURE__ */ h("span", { className: "lol-gameNo" }, t("game", { n: game.number })), /* @__PURE__ */ h("span", { className: "lol-gameSides" }, game.sides.map((side) => `${side.code} (${t(`side.${side.side}`)})`).join(" vs ")), /* @__PURE__ */ h(
+      "button",
+      {
+        type: "button",
+        className: "lol-btn",
+        "aria-expanded": openDraft === game.id,
+        disabled: game.id === "",
+        onClick: () => toggleDraft(game.id)
+      },
+      t("bp")
+    ), /* @__PURE__ */ h("span", { className: "lol-gameLinks" }, localizedTargets(game.vods, lang).map((vod) => /* @__PURE__ */ h(LinkButton, { key: vod.href, href: vod.href, label: linkLabel(vod.locale) }))), openDraft === game.id && (drafts[game.id] === void 0 ? /* @__PURE__ */ h("span", { className: "lol-hint" }, t("loading")) : drafts[game.id] === null ? /* @__PURE__ */ h("span", { className: "lol-hint" }, t("bp.empty")) : /* @__PURE__ */ h(DraftRows, { t, draft: drafts[game.id] })))))));
   }
   function Roll({ value }) {
     return /* @__PURE__ */ h("span", { key: String(value), className: "lol-roll" }, String(value));
@@ -1006,7 +1129,7 @@
       return team === void 0 || team.code === "" ? t(fallbackKey) : team.code;
     };
     const metric = (label, left, right) => /* @__PURE__ */ h("span", { key: label, className: "lol-liveMetric" }, `${label} `, /* @__PURE__ */ h("b", null, /* @__PURE__ */ h(Roll, { value: left }), " : ", /* @__PURE__ */ h(Roll, { value: right })));
-    const column = (players, code) => /* @__PURE__ */ h("div", { className: "lol-liveTeam" }, players.map((player) => /* @__PURE__ */ h("div", { key: player.id, className: "lol-livePlayer" }, /* @__PURE__ */ h("span", { className: "lol-liveName", title: player.champion === "" ? player.name : `${player.name} \xB7 ${player.champion}` }, displayName(player.name, code)), /* @__PURE__ */ h("span", { className: "lol-liveKda" }, `${player.kills}/${player.deaths}/${player.assists}`), /* @__PURE__ */ h("span", { className: "lol-liveCs", title: t("live.cs") }, String(player.cs)))));
+    const column = (players, code) => /* @__PURE__ */ h("div", { className: "lol-liveTeam" }, players.map((player) => /* @__PURE__ */ h("div", { key: player.id, className: "lol-livePlayer" }, /* @__PURE__ */ h("span", { className: "lol-liveName", title: player.champion === "" ? player.name : `${player.name} \xB7 ${player.champion}` }, /* @__PURE__ */ h(ChampionIcon, { champion: player.champion, className: "lol-champIcon" }), /* @__PURE__ */ h("span", { className: "lol-liveNameText" }, displayName(player.name, code))), /* @__PURE__ */ h("span", { className: "lol-liveKda" }, `${player.kills}/${player.deaths}/${player.assists}`), /* @__PURE__ */ h("span", { className: "lol-liveCs", title: t("live.cs") }, String(player.cs)))));
     return /* @__PURE__ */ h("div", { className: "lol-live" }, /* @__PURE__ */ h("div", { className: "lol-liveTop" }, /* @__PURE__ */ h("div", { className: "lol-liveKills" }, /* @__PURE__ */ h("span", { className: "lol-liveKillLabel" }, t("live.kills")), /* @__PURE__ */ h("span", { className: "lol-liveTeamCode" }, codeOf(blue.teamId, "side.blue")), /* @__PURE__ */ h("b", null, /* @__PURE__ */ h(Roll, { value: `${blue.kills} : ${red.kills}` })), /* @__PURE__ */ h("span", { className: "lol-liveTeamCode" }, codeOf(red.teamId, "side.red"))), /* @__PURE__ */ h("div", { className: "lol-liveMeta" }, metric(t("live.gold"), formatGold(blue.gold), formatGold(red.gold)), metric(t("live.towers"), blue.towers, red.towers), metric(t("live.dragons"), blue.dragons, red.dragons), metric(t("live.barons"), blue.barons, red.barons), finished ? /* @__PURE__ */ h("span", { className: "lol-liveFinished", title: t("live.finishedHint") }, t("live.finished")) : lag === null ? null : /* @__PURE__ */ h("span", { className: "lol-liveLag", title: t("live.lagHint") }, t("live.lag", { seconds: lag })))), /* @__PURE__ */ h("div", { className: "lol-livePlayers" }, column(blue.players, codeOf(blue.teamId, "side.blue")), column(red.players, codeOf(red.teamId, "side.red"))));
   }
   function MatchCard(props) {

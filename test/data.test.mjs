@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { normalizeEvent, normalizeLive } from '../.tmp/api.js';
+import { normalizeDraft, normalizeEvent, normalizeLive } from '../.tmp/api.js';
 import { anchorDayIndex, displayName, formatGold, groupByDay, orderDayGroups } from '../.tmp/format.js';
 
 const event = (state, bestOf, homeWins, awayWins) => normalizeEvent({
@@ -83,4 +83,14 @@ test('the timeline runs past -> today -> future', () => {
   assert.equal(anchorDayIndex(ordered, new Date('2026-11-05T12:00:00+08:00')), 2);
   assert.equal(anchorDayIndex(ordered, new Date('2026-11-06T12:00:00+08:00')), 3);
   assert.equal(anchorDayIndex(ordered, new Date('2026-11-20T12:00:00+08:00')), 3);
+});
+
+test('draft picks join the live metadata to roles and champions', () => {
+  const draft = normalizeDraft({
+    blueTeamMetadata: { participantMetadata: [{ participantId: 1, summonerName: 'GEN Kiin', championId: 'Olaf', role: 'top' }] },
+    redTeamMetadata: { participantMetadata: [{ participantId: 6, summonerName: 'IG TheShy', championId: 'KSante', role: 'top' }] },
+  });
+  assert.deepEqual(draft.blue[0], { role: 'top', champion: 'Olaf', player: 'GEN Kiin' });
+  assert.equal(draft.red[0].champion, 'KSante');
+  assert.equal(normalizeDraft({}), null);
 });

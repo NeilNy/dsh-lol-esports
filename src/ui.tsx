@@ -1,4 +1,4 @@
-import { loadDetail, loadLiveGameId, loadLiveStats, loadSchedule } from './api';
+import { championImageUrl, loadDetail, loadDraft, loadLiveGameId, loadLiveStats, loadSchedule } from './api';
 import { DIGEST_ASK_ID, LIVE_POLL, OFFICIAL_URL, REFRESH_INTERVAL, SITE_URL } from './constants';
 import {
   buildDigestPrompt,
@@ -13,6 +13,7 @@ import {
   orderDayGroups,
   resolveStageScope,
   resolveTodayScope,
+  roleLabel,
   stageName,
   stateLabel,
   type StageScope,
@@ -23,6 +24,8 @@ import { getReact, h } from './runtime';
 import { ensureStyles } from './styles';
 import type {
   AskResult,
+  Draft,
+  DraftPick,
   LiveStats,
   MatchDetailData,
   MatchEvent,
@@ -73,6 +76,21 @@ function TeamMark({ team }: { team: Team }) {
     );
   }
   return <img className="lol-mark" src={team.image} alt="" loading="lazy" onError={() => setBroken(true)} />;
+}
+
+/** Champion portrait from Data Dragon; renders an empty box until it resolves. */
+function ChampionIcon({ champion, className }: { champion: string; className: string }) {
+  const { useState, useEffect } = getReact();
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void championImageUrl(champion).then(next => {
+      if (!cancelled) setUrl(next);
+    });
+    return () => { cancelled = true; };
+  }, [champion]);
+  if (url === null) return <span className={className} aria-hidden="true" />;
+  return <img className={className} src={url} alt="" loading="lazy" />;
 }
 
 function LinkButton({ href, label }: { href: string; label: string }) {
@@ -258,6 +276,27 @@ function DigestAsk({ t, today, stage, onSubmit, pending, error }: DigestAskProps
   );
 }
 
+function DraftRows({ t, draft }: { t: Translate; draft: Draft }) {
+  const row = (picks: DraftPick[], side: string) => (
+    <div className="lol-draftRow" key={side}>
+      <span className="lol-draftSide">{t(`side.${side}`)}</span>
+      {picks.map(pick => (
+        <span key={`${side}-${pick.role}-${pick.champion}`} className="lol-draftPick" title={pick.player}>
+          <ChampionIcon champion={pick.champion} className="lol-draftImg" />
+          <span className="lol-draftRole">{roleLabel(pick.role, t)}</span>
+          <span className="lol-draftChamp">{pick.champion}</span>
+        </span>
+      ))}
+    </div>
+  );
+  return (
+    <div className="lol-draft">
+      {row(draft.blue, 'blue')}
+      {row(draft.red, 'red')}
+    </div>
+  );
+}
+
 /** Per-match detail: watch links and the games that were actually played. */
 function MatchDetail({ t, match, lang }: { t: Translate; match: MatchEvent; lang: string }) {
   const { useState, useEffect } = getReact();
@@ -276,6 +315,19 @@ function MatchDetail({ t, match, lang }: { t: Translate; match: MatchEvent; lang
     });
     return () => { cancelled = true; };
   }, [match.id]);
+
+  const [openDraft, setOpenDraft] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, Draft | null>>({});
+  const toggleDraft = (gameId: string) => {
+    if (gameId === '') return;
+    const next = openDraft === gameId ? null : gameId;
+    setOpenDraft(next);
+    if (next !== null && drafts[gameId] === undefined) {
+      void loadDraft(gameId).then(draft => {
+        setDrafts((current: Record<string, Draft | null>) => ({ ...current, [gameId]: draft }));
+      });
+    }
+  };
 
   const detail = state.detail;
   const first = detail !== null && detail.games.length > 0 ? detail.games[0] : null;
@@ -319,11 +371,27 @@ function MatchDetail({ t, match, lang }: { t: Translate; match: MatchEvent; lang
                 <span className="lol-gameSides">
                   {game.sides.map(side => `${side.code} (${t(`side.${side.side}`)})`).join(' vs ')}
                 </span>
+                <button
+                  type="button"
+                  className="lol-btn"
+                  aria-expanded={openDraft === game.id}
+                  disabled={game.id === ''}
+                  onClick={() => toggleDraft(game.id)}
+                >
+                  {t('bp')}
+                </button>
                 <span className="lol-gameLinks">
                   {localizedTargets(game.vods, lang).map(vod => (
                     <LinkButton key={vod.href} href={vod.href} label={linkLabel(vod.locale)} />
                   ))}
                 </span>
+                {openDraft === game.id && (
+                  drafts[game.id] === undefined
+                    ? <span className="lol-hint">{t('loading')}</span>
+                    : drafts[game.id] === null
+                      ? <span className="lol-hint">{t('bp.empty')}</span>
+                      : <DraftRows t={t} draft={drafts[game.id] as Draft} />
+                )}
               </li>
             ))}
           </ul>
@@ -413,7 +481,8 @@ function LiveStrip({ t, match }: { t: Translate; match: MatchEvent }) {
       {players.map(player => (
         <div key={player.id} className="lol-livePlayer">
           <span className="lol-liveName" title={player.champion === '' ? player.name : `${player.name} · ${player.champion}`}>
-            {displayName(player.name, code)}
+            <ChampionIcon champion={player.champion} className="lol-champIcon" />
+            <span className="lol-liveNameText">{displayName(player.name, code)}</span>
           </span>
           <span className="lol-liveKda">{`${player.kills}/${player.deaths}/${player.assists}`}</span>
           <span className="lol-liveCs" title={t('live.cs')}>{String(player.cs)}</span>

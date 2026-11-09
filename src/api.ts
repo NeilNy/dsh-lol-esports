@@ -13,6 +13,8 @@ import {
 import { formatGold } from './format';
 import { streamUrl, vodUrl, watchTargets } from './links';
 import type {
+  Draft,
+  DraftPick,
   LiveGameRef,
   LivePlayer,
   LiveSide,
@@ -137,6 +139,7 @@ export async function loadDetail(matchId: string): Promise<MatchDetailData> {
         const vods = Array.isArray(game.vods) ? game.vods : [];
         return {
           number: game.number,
+          id: game.id === undefined || game.id === null ? '' : String(game.id),
           sides: (Array.isArray(game.teams) ? game.teams : []).map((side: Payload) => ({
             side: side.side,
             code: teamById.get(String(side.id))?.code ?? '?',
@@ -251,6 +254,66 @@ async function fetchWindow(gameId: string, startingTime: string | null): Promise
  * the game's opening frames instead, which is all there is while that window
  * does not exist yet.
  */
+// ---------------------------------------------------------------- draft
+
+const draftCache = new Map<string, { at: number; draft: Draft | null }>();
+
+function draftPicks(metadata: Payload, key: 'blueTeamMetadata' | 'redTeamMetadata'): DraftPick[] {
+  const list = metadata?.[key]?.participantMetadata;
+  if (!Array.isArray(list)) return [];
+  return list.map((entry: Payload) => ({
+    role: typeof entry.role === 'string' ? entry.role : '',
+    champion: typeof entry.championId === 'string' ? entry.championId : '',
+    player: typeof entry.summonerName === 'string' ? entry.summonerName : '',
+  }));
+}
+
+/**
+ * Picks for one game. The livestats metadata carries each player's champion and
+ * role; Riot's public feeds expose no bans, so this is picks only.
+ */
+export function normalizeDraft(metadata: Payload): Draft | null {
+  const blue = draftPicks(metadata, 'blueTeamMetadata');
+  const red = draftPicks(metadata, 'redTeamMetadata');
+  if (blue.length === 0 && red.length === 0) return null;
+  return { blue, red };
+}
+
+export async function loadDraft(gameId: string): Promise<Draft | null> {
+  if (gameId === '') return null;
+  const cached = draftCache.get(gameId);
+  if (cached !== undefined && Date.now() - cached.at < 30 * 60 * 1000) return cached.draft;
+  let payload: Payload | null = null;
+  try {
+    payload = await fetchWindow(gameId, null);
+  } catch {
+    payload = null;
+  }
+  const draft = payload === null ? null : normalizeDraft(payload.gameMetadata);
+  draftCache.set(gameId, { at: Date.now(), draft });
+  return draft;
+}
+
+const DD_BASE = 'https://ddragon.leagueoflegends.com/cdn';
+const DD_FALLBACK = '16.22.1';
+let championVersion: string | null = null;
+
+/** Riot's Data Dragon hosts the portraits; the version lookup happens once. */
+export async function championImageUrl(champion: string): Promise<string | null> {
+  const id = champion.replace(/[^A-Za-z0-9]/g, '');
+  if (id === '') return null;
+  if (championVersion === null) {
+    try {
+      const response = await fetch(`${DD_BASE}/api/versions.json`);
+      const versions = await response.json();
+      championVersion = Array.isArray(versions) && versions.length > 0 ? String(versions[0]) : DD_FALLBACK;
+    } catch {
+      championVersion = DD_FALLBACK;
+    }
+  }
+  return `${DD_BASE}/${championVersion}/img/champion/${id}.png`;
+}
+
 export async function loadLiveStats(gameId: string): Promise<LiveStats | null> {
   const cached = liveStatsCache.get(gameId);
   if (cached !== undefined && Date.now() - cached.at < LIVE_POLL) return cached.stats;

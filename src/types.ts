@@ -36,8 +36,21 @@ export interface GameSide {
 
 export interface GameEntry {
   number: number;
+  /** Riot's game id, used to pull the draft from the livestats feed. */
+  id: string;
   sides: GameSide[];
   vods: VodTarget[];
+}
+
+export interface DraftPick {
+  role: string;
+  champion: string;
+  player: string;
+}
+
+export interface Draft {
+  blue: DraftPick[];
+  red: DraftPick[];
 }
 
 export interface StreamTarget {
